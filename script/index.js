@@ -1,3 +1,19 @@
+const createElement = (arr) =>{
+    const htmlElement = arr.map((el)=> `<span class="btn">${el}</span>`);
+    return htmlElement.join(" ")
+}
+
+const manageSpinner = (status) =>{
+    if(status == true){
+        document.getElementById("spinner-container").classList.remove("hidden");
+        document.getElementById("word-container").classList.add("hidden");
+    }
+    else{
+        document.getElementById("word-container").classList.remove("hidden");
+        document.getElementById("spinner-container").classList.add("hidden");
+    }
+}
+
 const loadLesson = () => {
     fetch("https://openapi.programming-hero.com/api/levels/all")
         .then(res => res.json())
@@ -11,6 +27,7 @@ const removeActive = () => {
 }
 
 const loadLevelWord = (id) => {
+    manageSpinner(true);
     let url = `https://openapi.programming-hero.com/api/level/${id}`
     fetch(url)
         .then(res => res.json())
@@ -33,26 +50,39 @@ const loadWordDetails = (id) => {
         .then(details => displayWordDetail(details.data));
 }
 
+// "data": {
+// "word": "Eager",
+// "meaning": "আগ্রহী",
+// "pronunciation": "ইগার",
+// "level": 1,
+// "sentence": "The kids were eager to open their gifts.",
+// "points": 1,
+// "partsOfSpeech": "adjective",
+// "synonyms": [
+// "enthusiastic",
+// "excited",
+// "keen"
+// ],
+// "id": 5
+
 displayWordDetail = (details) => {
     // console.log(details);
     const detailContainer = document.getElementById("detail-container");
     detailContainer.innerHTML = `
      <div class="">
-                    <h2 class="text-3xl font-bold">Eager (<i class="fa-solid fa-microphone"></i>:ইগার)</h2>
+                    <h2 class="text-2xl font-bold">${details.word} (<i class="fa-solid fa-microphone"></i>:${details.pronunciation})</h2>
                 </div>
                 <div class="">
-                    <p class="text-2xl font-semibold">Meaning</p>
-                    <p class="text-xl font-medium">আগ্রহী</p>
+                    <p class="text-xl font-semibold">Meaning</p>
+                    <p class="font-medium">${details.meaning}</p>
                 </div>
                 <div class="">
-                    <p class="text-2xl font-semibold">Example</p>
-                    <p class="text-gray-500">The kids were eager to open their gifts.</p>
+                    <p class="text-xl font-semibold">Example</p>
+                    <p class="text-gray-500">${details.sentence}</p>
                 </div>
                 <div class="">
-                    <p class="text-xl font-medium">সমার্থক শব্দ গুলো</p>
-                    <span class="btn">synonnim</span>
-                    <span class="btn">synonnim</span>
-                    <span class="btn">synonnim</span>
+                    <p class="text-xl font-medium">synonyms</p>
+                    <div>${createElement(details.synonyms)}</div>
                 </div>
     
     `
@@ -71,6 +101,10 @@ const displayWord = (words) => {
             <h2 class="text-[13px] font-medium text-[#79716B]">এই Lesson এ এখনো কোন Vocabulary যুক্ত করা হয়নি।</h2>
             <h2 class="text-4xl text-[#292524] font-semibold">নেক্সট Lesson এ যান।</h2>
         </div>`
+
+        manageSpinner(false)
+        return
+
     }
 
     words.forEach(word => {
@@ -88,6 +122,7 @@ const displayWord = (words) => {
         `
         wordContainer.append(wordDiv)
     })
+      manageSpinner(false)
 
 }
 
@@ -106,7 +141,15 @@ const displayLesson = (lessons) => {
         `
         // append 
         levelContainer.append(divBtn);
+        // manageSpinner(false)
     }
 
 }
 loadLesson()
+
+document.getElementById("btn-search").addEventListener("click", ()=>{
+    const input = document.getElementById("input-search");
+    const searchValue = input.value.trim().toLowerCase();
+    console.log(searchValue);
+    
+})
